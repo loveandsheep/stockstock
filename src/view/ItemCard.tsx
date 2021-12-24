@@ -3,10 +3,25 @@ import Card from '@mui/material/Card'
 import { Button, Box } from '@mui/material';
 import { CardContent, CardActions, CardMedia, Typography } from '@mui/material';
 
-export interface IItemCardProps {
+export type IItemCardProps = {
+	title: string,
+	detail: string,
+	tags: Array<string>,
+	thumb: string,
 }
 
 export default class ItemCard extends React.Component<IItemCardProps> {
+
+	constructor(props: IItemCardProps){
+		super(props);
+
+		this.state = {
+			title: props.title,
+			detail: props.detail,
+			thumb: props.thumb,
+		}
+	}
+
 	public render() {
 		const cardStyle = {
 			margin: '10px',
@@ -19,17 +34,15 @@ export default class ItemCard extends React.Component<IItemCardProps> {
 					<CardMedia
 						component="img"
 						height="194"
-						image="https://tenari.jp/wp-content/uploads/2019/08/header_cat-e1565445515390.jpg"
+						image={this.props.thumb}
 					/>
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 						<CardContent>
 							<Typography sx={{ mb: 1.5 }} color="text.secondary">
-								これも日本語だよ
+								{this.props.title}
 							</Typography>
 							<Typography variant="body2">
-								well meaning and kindly.
-								<br />
-								{'"a benevolent smile"'}
+								{this.props.detail}
 							</Typography>
 						</CardContent>
 						<CardActions>
