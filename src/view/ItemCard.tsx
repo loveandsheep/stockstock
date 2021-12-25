@@ -13,6 +13,9 @@ export type IItemCardProps = {
 	detail: string,
 	tags: Array<string>,
 	thumb: string,
+	itemId: string,
+	date: string,
+	deleteAction: (id: any, title: string) => void,
 }
 
 type IItemCardState = {
@@ -71,6 +74,9 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							<Typography style={style_detail} variant="caption">
 								{this.state.detail}
 							</Typography>
+							<Typography variant='caption' style={{color: '#999999'}}>
+								{this.props.date}
+							</Typography>
 
 						</CardContent>
 
@@ -78,7 +84,7 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							<Box>
 								{this.state.tags ? 
 								this.state.tags.map(((tag: string) => 
-									<Chip label={tag} size="small" color='primary'/>
+									<Chip key={tag} label={tag} size="small" color='primary'/>
 								)) : <></>}
 							</Box>
 							<IconButton aria-label="edit" size="small">
@@ -87,7 +93,9 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							<IconButton aria-label="fullSize" size="small">
 								<FullScreenIcon fontSize="inherit" />
 							</IconButton>
-							<IconButton aria-label="delete" size="small">
+							<IconButton aria-label="delete" size="small"
+								onClick={() => this.props.deleteAction(this.props.itemId, this.props.title)}
+							>
 								<DeleteIcon fontSize="inherit" />
 							</IconButton>
 						</CardActions>

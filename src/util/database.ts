@@ -1,8 +1,13 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { DocumentData, getFirestore, QuerySnapshot } from "firebase/firestore"
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, orderBy, limit } from "firebase/firestore";
 import axios from 'axios';
+import { getDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import { DocumentSnapshot } from 'firebase/firestore';
+import { deleteDoc } from 'firebase/firestore';
 
+const name_collection = "items-stock";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyDq020-qPzBu87XT6Qibu9Zdwgm2Ox-zMI",
@@ -25,8 +30,30 @@ export const db_initialize = () => {
  * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
  */
 export const db_getItems = async (): Promise<QuerySnapshot<DocumentData> > => {
-	const qsn = await getDocs(collection(db, "items-stock"));
+	const q = query(collection(db, name_collection), orderBy('date', 'asc'), limit(100));//or desc
+	const qsn = await getDocs(q);
 	return qsn;
+}
+
+/**
+ *
+ * IDを元に単一アイテムを取得
+ * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
+ */
+export const db_getItem = async (id: any): Promise<DocumentSnapshot<DocumentData> > => {
+	const docRef = doc(db, name_collection, id)
+	const qsn: DocumentSnapshot<DocumentData> = await getDoc(docRef);
+	return qsn;
+}
+
+
+/**
+ * アイテムの消去
+ *
+ * @param {*} id - ターゲットとなるアイテムのID
+ */
+export const db_deleteItem = async (id: any) => {
+	await deleteDoc(doc(db, name_collection, id));
 }
 
 /**
@@ -42,12 +69,17 @@ export const db_createNewCardFromURL = async (url: string): Promise<string> => {
 	console.log(JSON.stringify(meta));
 	console.log("Image :" + meta[url]['og:image']);
 
-	const docRef = await addDoc(collection(db, "items-stock"), {
+	const tags = makeTagByMetaInfo(url, meta[url]);
+
+	const now = Date();
+	const docRef = await addDoc(collection(db, name_collection), {
 		title: meta[url]['og:title'],
 		detail: meta[url]['og:description'],
 		thumb: meta[url]['og:image'],
 		thumbRef: 'ogp',
-		url: url
+		tags: tags,
+		url: url,
+		date: now,
 	});
 
 	return docRef.id;
@@ -64,8 +96,21 @@ export const db_createFromURL = async (url: string): Promise<any> => {
 	return res.data;
 }
 
+const makeTagByMetaInfo = (url: string, info: any): Array<string> => {
+	let ret: Array<string> = [];
 
-function formatDate (date: Date, format: string): string {
+	if (url.match(/youtu\.be/)) ret.push('YouTube');
+	else if (url.match(/youtube/)) ret.push('YouTube');
+	
+	if (info['og:description'].match(/tutorial/)) ret.push('Tutorial');
+	else if (info['og:description'].match(/entagma/)) ret.push('Tutorial');
+	
+	if (info['og:description'].match(/Houdini/)) ret.push('Houdini');
+	
+	return ret;
+}
+
+export function formatDate (date: Date, format: string): string {
     format = format.replace(/yyyy/g, date.getFullYear().toString());
     format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2));
     format = format.replace(/dd/g, ('0' + date.getDate()).slice(-2));
