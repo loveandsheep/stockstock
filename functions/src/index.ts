@@ -40,6 +40,10 @@ export const getOgpFromExternalWebsite = functions.https.onRequest(async (reques
       }
     }));
 
+    response.set('Access-Control-Allow-Origin', '*');
+    response.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS, POST');
+    response.set('Access-Control-Allow-Headers', 'Content-Type, authorization');
+
   response.status(200).json(ogps);
 })
 

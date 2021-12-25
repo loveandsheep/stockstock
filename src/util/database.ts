@@ -1,6 +1,8 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { DocumentData, getFirestore, QuerySnapshot } from "firebase/firestore"
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import axios from 'axios';
+
 
 const firebaseConfig = {
 	apiKey: "AIzaSyDq020-qPzBu87XT6Qibu9Zdwgm2Ox-zMI",
@@ -17,24 +19,49 @@ const db = getFirestore(app);
 export const db_initialize = () => {
 }
 
+/**
+ * 
+ *　コレクションからカードの一覧を取得
+ * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
+ */
 export const db_getItems = async (): Promise<QuerySnapshot<DocumentData> > => {
 	const qsn = await getDocs(collection(db, "items-stock"));
 	return qsn;
 }
 
-export const db_createFromURL = () => {
-	const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
-	const url = "https://zenn.dev/mattn/articles/d16e9c8bb6138c";
+/**
+ *
+ * URLからメタ情報を拾ってきて新規カードを作成する
+ * @param {string} url - 取得先のURL
+ * @return {*}  {Promise<string>} - 作成したカードのドキュメントID
+ */
+export const db_createNewCardFromURL = async (url: string): Promise<string> => {
+	//TODO: OGPが無かった場合のフォロー
+	const meta = await db_createFromURL(url);
 
-	fetch(url).then(res => res.text()).then(text => {
-		const el = new DOMParser().parseFromString(text, "text/html")
-		const headEls = (el.head.children)
-		Array.from(headEls).map(v => {
-			const prop = v.getAttribute('property')
-			if (!prop) return;
-			console.log(prop, v.getAttribute("content"))
-		})
-	})
+	console.log(JSON.stringify(meta));
+	console.log("Image :" + meta[url]['og:image']);
+
+	const docRef = await addDoc(collection(db, "items-stock"), {
+		title: meta[url]['og:title'],
+		detail: meta[url]['og:description'],
+		thumb: meta[url]['og:image'],
+		thumbRef: 'ogp',
+		url: url
+	});
+
+	return docRef.id;
+}
+
+/**
+ *
+ * Cloud function経由でメタ情報を引っ張ってくる
+ * @param {string} url
+ * @return {*}  {Promise<any>}
+ */
+export const db_createFromURL = async (url: string): Promise<any> => {
+	const res = await axios.get('https://us-central1-stockstock-67299.cloudfunctions.net/getOgpFromExternalWebsite?url=' + url)
+	return res.data;
 }
 
 

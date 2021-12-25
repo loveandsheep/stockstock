@@ -1,7 +1,12 @@
 import * as React from 'react';
 import Card from '@mui/material/Card'
-import { Button, Box } from '@mui/material';
+import { Button, Box, Chip } from '@mui/material';
 import { CardContent, CardActions, CardMedia, Typography } from '@mui/material';
+import { IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import FullScreenIcon from '@mui/icons-material/Fullscreen';
+
 
 export type IItemCardProps = {
 	title: string,
@@ -10,7 +15,14 @@ export type IItemCardProps = {
 	thumb: string,
 }
 
-export default class ItemCard extends React.Component<IItemCardProps> {
+type IItemCardState = {
+	title: string,
+	detail: string,
+	tags: Array<string>,
+	thumb: string,
+}
+
+export default class ItemCard extends React.Component<IItemCardProps, IItemCardState> {
 
 	constructor(props: IItemCardProps){
 		super(props);
@@ -19,6 +31,7 @@ export default class ItemCard extends React.Component<IItemCardProps> {
 			title: props.title,
 			detail: props.detail,
 			thumb: props.thumb,
+			tags: props.tags,
 		}
 	}
 
@@ -28,25 +41,55 @@ export default class ItemCard extends React.Component<IItemCardProps> {
 			borderRadius: '10px',
 		}
 
+		const style_title = {
+			display: 'block',
+			textOverflow: 'ellipsis',
+			whiteSpace: 'nowrap',
+			overflow: 'hidden',		
+		} as React.CSSProperties;
+
+		const style_detail = {
+			display: '-webkit-box',
+			WebkitBoxOrient: 'vertical',
+			WebkitLineClamp: 3,
+			overflow: 'hidden',		
+		} as React.CSSProperties;
+
 		return (
 			<div>
 				<Card style={cardStyle}>
 					<CardMedia
 						component="img"
-						height="194"
-						image={this.props.thumb}
+						height="150"
+						image={this.state.thumb}
 					/>
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 						<CardContent>
-							<Typography sx={{ mb: 1.5 }} color="text.secondary">
-								{this.props.title}
+							<Typography style={style_title} variant='h6'>
+								{this.state.title}
 							</Typography>
-							<Typography variant="body2">
-								{this.props.detail}
+							<Typography style={style_detail} variant="caption">
+								{this.state.detail}
 							</Typography>
+
 						</CardContent>
+
 						<CardActions>
-							<Button size="small">Learn More</Button>
+							<Box>
+								{this.state.tags ? 
+								this.state.tags.map(((tag: string) => 
+									<Chip label={tag} size="small" color='primary'/>
+								)) : <></>}
+							</Box>
+							<IconButton aria-label="edit" size="small">
+								<EditIcon fontSize="inherit" />
+							</IconButton>
+							<IconButton aria-label="fullSize" size="small">
+								<FullScreenIcon fontSize="inherit" />
+							</IconButton>
+							<IconButton aria-label="delete" size="small">
+								<DeleteIcon fontSize="inherit" />
+							</IconButton>
 						</CardActions>
 					</Box>
 				</Card>

@@ -4,7 +4,7 @@ import ItemCard, { IItemCardProps } from './ItemCard';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
-import {db_createFromURL, db_getItems} from '../util/database'
+import {db_createFromURL, db_createNewCardFromURL, db_getItems} from '../util/database'
 import { DocumentData, QuerySnapshot } from 'firebase/firestore';
 
 export interface ICardViewProps {
@@ -23,6 +23,9 @@ const StyledFab = styled(Fab)({
 	margin: '0 auto',
 });
 
+/**
+ * カードの一覧を表示するためのクラス
+ */
 export default class CardView extends React.Component<ICardViewProps, ICardViewState> {
 
 	constructor(props: ICardViewProps){
@@ -32,7 +35,12 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		};
 		
 		this.reloadCards();
-		db_createFromURL();
+	}
+
+	componentDidMount(){
+		// db_createNewCardFromURL('https://ryohin-keikaku.jp/').then(id => {
+		// 	console.log("id :" + id);
+		// });
 	}
 
 	createCardFromUrl() {
@@ -47,12 +55,18 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		});
 	}
 
+	/**
+	 * ビューにカード情報のコンポーネントItem Cardを追加する
+	 *
+	 * @param {DocumentData} data
+	 * @memberof CardView
+	 */
 	pushCard(data: DocumentData) {
 		const newCard = (
 			<ItemCard 
 				title={data.title} 
 				detail={data.detail}
-				tags={[]}
+				tags={data.tags}
 				thumb={data.thumb}
 			/>
 		)
@@ -62,11 +76,12 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	}
 
 	public render() {
+
 		return (
 			<div>
 			<Grid container>
 				{this.state.cards.map(((card: any) => 
-				<Grid item xs={4}>
+				<Grid item xs={12} md={6} lg={3}>
 					{card}
 				</Grid>
 				))}				
