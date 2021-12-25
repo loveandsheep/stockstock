@@ -84,6 +84,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 				thumb={data.thumb}
 				key={id}
 				itemId={id}
+				url={data.url}
 				date={formatDate(new Date(data.date), "yyyy.MM.dd-HH:mm:ss")}
 				deleteAction={this.openDeleteModal}
 			/>
@@ -135,7 +136,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 
 			<Grid container>
 				{this.state.cards.map(((card: any, index: number) => 
-				<Grid item xs={12} md={3} lg={4} key={"grid" + index}>
+				<Grid item xs={12} md={4} lg={3} key={"grid" + index}>
 					{card}
 				</Grid>
 				))}				

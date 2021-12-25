@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Card from '@mui/material/Card'
-import { Button, Box, Chip } from '@mui/material';
+import { Button, Box, Chip, CardActionArea } from '@mui/material';
 import { CardContent, CardActions, CardMedia, Typography } from '@mui/material';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,6 +15,7 @@ export type IItemCardProps = {
 	thumb: string,
 	itemId: string,
 	date: string,
+	url: string,
 	deleteAction: (id: any, title: string) => void,
 }
 
@@ -36,6 +37,11 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 			thumb: props.thumb,
 			tags: props.tags,
 		}
+	}
+
+	openInNewTab = (url: string) => {
+		const newWindow = window.open(url)
+		if (newWindow) newWindow.opener = null
 	}
 
 	public render() {
@@ -61,11 +67,14 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 		return (
 			<div>
 				<Card style={cardStyle}>
-					<CardMedia
-						component="img"
-						height="150"
-						image={this.state.thumb}
-					/>
+					<CardActionArea>
+						<CardMedia
+							component="img"
+							height="150"
+							image={this.state.thumb}
+							onClick={() => this.openInNewTab(this.props.url)}
+						/>
+					</CardActionArea>
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 						<CardContent>
 							<Typography style={style_title} variant='h6'>
@@ -80,24 +89,26 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 
 						</CardContent>
 
-						<CardActions>
-							<Box>
+						<CardActions style={{display: 'flex', flexDirection: 'column'}}>
+							<Box style={{width: '100%'}}>
 								{this.state.tags ? 
 								this.state.tags.map(((tag: string) => 
-									<Chip key={tag} label={tag} size="small" color='primary'/>
+									<Chip style={{margin: '2px'}} key={tag} label={tag} size="small" color='primary'/>
 								)) : <></>}
 							</Box>
-							<IconButton aria-label="edit" size="small">
-								<EditIcon fontSize="inherit" />
-							</IconButton>
-							<IconButton aria-label="fullSize" size="small">
-								<FullScreenIcon fontSize="inherit" />
-							</IconButton>
-							<IconButton aria-label="delete" size="small"
-								onClick={() => this.props.deleteAction(this.props.itemId, this.props.title)}
-							>
-								<DeleteIcon fontSize="inherit" />
-							</IconButton>
+							<Box style={{width: '100%', display: 'flex', justifyContent: 'right'}}>
+								<IconButton aria-label="edit" size="small">
+									<EditIcon fontSize="inherit" />
+								</IconButton>
+								<IconButton aria-label="fullSize" size="small">
+									<FullScreenIcon fontSize="inherit" />
+								</IconButton>
+								<IconButton aria-label="delete" size="small"
+									onClick={() => this.props.deleteAction(this.props.itemId, this.props.title)}
+								>
+									<DeleteIcon fontSize="inherit" />
+								</IconButton>
+							</Box>
 						</CardActions>
 					</Box>
 				</Card>

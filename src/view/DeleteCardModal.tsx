@@ -43,8 +43,8 @@ export default class DeleteCardModalView extends React.Component<IDeleteCardModa
                 </DialogTitle>
                 <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    <p><b>"{this.props.title}"</b>を消去しますか？</p>
-                    <p>一度消すと元に戻せません。</p>
+                    <b>"{this.props.title}"</b>を消去しますか？<br/>
+                    一度消すと元に戻せません。
                 </DialogContentText>
                 </DialogContent>
                 <DialogActions>
