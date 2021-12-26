@@ -107,7 +107,9 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		})
 	}
 
-	openCreateModal = () => {this.setState({createModal: true});};
+	openCreateModal = () => {
+		console.log("open modal");
+		this.setState({createModal: true});};
 	closeCreateModal = () => {this.setState({createModal: false})};
 	openDeleteModal = (id: any, title: string) => {
 		this.setState({
