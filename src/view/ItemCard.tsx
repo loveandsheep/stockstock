@@ -13,6 +13,21 @@ export type tagInfo = {
 	id: string,
 }
 
+/**
+ * カード情報…データベースと一致するプロパティ
+ *
+ */
+export type cardInfo = {
+	title: string,
+	detail: string,
+	tags: Array<tagInfo>,
+	thumb: string,
+	thumbRef: string,
+	itemId: string,
+	date: string,
+	url: string, 
+}
+
 export type IItemCardProps = {
 	title: string,
 	detail: string,

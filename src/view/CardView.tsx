@@ -1,6 +1,6 @@
 import { Grid, AppBar, Toolbar, Button } from '@mui/material';
 import * as React from 'react';
-import ItemCard, { IItemCardProps, tagInfo } from './ItemCard';
+import ItemCard, { cardInfo, IItemCardProps, tagInfo } from './ItemCard';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
@@ -9,6 +9,7 @@ import { DocumentData, QuerySnapshot } from 'firebase/firestore';
 import CreateCardModalView from './CreateCardModalView';
 import { IronTwoTone } from '@mui/icons-material';
 import DeleteCardModalView from './DeleteCardModal';
+import ItemDetailView from '../util/ItemDetailView';
 
 export interface ICardViewProps {
 }
@@ -17,6 +18,8 @@ interface ICardViewState {
 	cards: any,
 	createModal: boolean,
 	deleteModal: boolean,
+	detailModal: boolean,
+	detailCard: cardInfo,
 	deleteTarget: string,
 	deleteTitle: string,
 	tagList: {[name: string]: tagInfo},
@@ -42,6 +45,8 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			cards: [],
 			createModal: false,
 			deleteModal: false,
+			detailModal: false,
+			detailCard: undefined!,
 			deleteTarget: '',
 			deleteTitle: '',
 			tagList: {},
@@ -85,7 +90,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	}
 
 	/**
-	 * 
+	 * アイテム情報からカードのReactElementを作る
 	 *
 	 * @param {DocumentData} data
 	 * @param {string} id
@@ -103,7 +108,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			url={data.url}
 			date={formatDate(new Date(data.date.toDate()), "yyyy.MM.dd-HH:mm:ss")}
 			deleteAction={this.openDeleteModal}
-		/>		
+		/>
 		)
 	}
 
@@ -164,10 +169,16 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		return ret;
 	}
 
-	openCreateModal = () => {
-		console.log("open modal");
-		this.setState({createModal: true});};
+	openCreateModal = () => {this.setState({createModal: true});};
 	closeCreateModal = () => {this.setState({createModal: false})};
+	closeDetailModal = () => {this.setState({detailModal: true})};
+	openDetailModal = (id: any, card: cardInfo) => {
+		id = id;
+		this.setState({
+			detailModal: true,
+			detailCard: card,
+		});
+	}
 	openDeleteModal = (id: any, title: string) => {
 		this.setState({
 			deleteModal: true,
@@ -194,6 +205,16 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		return (
 			<div>
 			<Button onClick={this.testMethod} >test</Button>
+			{
+				this.state.detailCard !== undefined ? 
+				<ItemDetailView 
+					card={this.state.detailCard}
+					open={this.state.detailModal}
+					onClose={this.closeDetailModal}
+				/>
+				:
+				<></>
+			}
 				<DeleteCardModalView
 					open={this.state.deleteModal}
 					onClose={this.closeDeleteModal}
