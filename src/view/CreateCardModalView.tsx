@@ -4,7 +4,6 @@ import { Dialog, Tabs, Tab, Typography, TextField, Button, CircularProgress } fr
 import { db_createNewCardFromURL, db_getItem, db_getItems } from '../util/database';
 import { DocumentData, QuerySnapshot } from 'firebase/firestore';
 
-
 export interface ICreateCardModalViewProps {
     open: boolean,
     onClose: VoidFunction,
