@@ -9,6 +9,7 @@ export interface ICreateCardModalViewProps {
     open: boolean,
     onClose: VoidFunction,
     onNewCard: (data: DocumentData, id: any) => void,
+    defaultUrl: string;
 }
 
 export interface ICreateCardModalViewState {
@@ -30,7 +31,7 @@ export default class CreateCardModalView extends React.Component<ICreateCardModa
 
         this.state = {
             tabSelect: 0,
-            urlText: "",
+            urlText: this.props.defaultUrl,
             adding: false,
         }
     }

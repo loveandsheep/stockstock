@@ -1,6 +1,6 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { DocumentData, getFirestore, QuerySnapshot } from "firebase/firestore"
-import { collection, getDocs, addDoc, query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, orderBy, limit, where, Timestamp } from "firebase/firestore";
 import axios from 'axios';
 import { getDoc } from 'firebase/firestore';
 import { doc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import { DocumentSnapshot } from 'firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
 
 const name_collection = "items-stock";
+const name_tagCollection = "tags";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyDq020-qPzBu87XT6Qibu9Zdwgm2Ox-zMI",
@@ -30,7 +31,7 @@ export const db_initialize = () => {
  * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
  */
 export const db_getItems = async (): Promise<QuerySnapshot<DocumentData> > => {
-	const q = query(collection(db, name_collection), orderBy('date', 'asc'), limit(100));//or desc
+	const q = query(collection(db, name_collection), orderBy('date', 'desc'), limit(100));//or desc
 	const qsn = await getDocs(q);
 	return qsn;
 }
@@ -71,7 +72,7 @@ export const db_createNewCardFromURL = async (url: string): Promise<string> => {
 
 	const tags = makeTagByMetaInfo(url, meta[url]);
 
-	const now = Date();
+	const now = Timestamp.fromDate(new Date());
 	const docRef = await addDoc(collection(db, name_collection), {
 		title: meta[url]['og:title'],
 		detail: meta[url]['og:description'],
@@ -94,6 +95,74 @@ export const db_createNewCardFromURL = async (url: string): Promise<string> => {
 export const db_createFromURL = async (url: string): Promise<any> => {
 	const res = await axios.get('https://us-central1-stockstock-67299.cloudfunctions.net/getOgpFromExternalWebsite?url=' + url)
 	return res.data;
+}
+
+
+/**
+ *
+ * タグの新規作成
+ * @param {string} label
+ * @param {string} color
+ * @return {*}  {Promise<any>}
+ */
+const db_createNewTag = async(label: string, color: string): Promise<any> => {
+
+	const docRef = await addDoc(collection(db, name_tagCollection), {
+		label: label,
+		color: color,
+	});
+
+	return docRef.id;
+}
+
+/**
+ *
+ * タグの一覧を取得
+ * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
+ */
+const db_getTagList = async(): Promise<QuerySnapshot<DocumentData> > => {
+	const c = collection(db, name_tagCollection);
+	const q = query(c);
+	const qsn = await getDocs(q);
+	return qsn;
+}
+
+/**
+ *
+ * タグIDからラベルを取得
+ * @param {string} id
+ * @return {*}  {Promise<string>}
+ */
+export const db_getTagLabel = async(id: string): Promise<string> => {
+	const docRef = doc(db, name_tagCollection, id)
+	const qsn: DocumentSnapshot<DocumentData> = await getDoc(docRef);
+	const ret: string = qsn.data()!.label;
+	return ret;
+}
+
+/**
+ *
+ * ラベルからタグのドキュメントを探索
+ * @param {string} label
+ * @return {Primise<string>} - ドキュメントID
+ */
+export const db_getTag = async(label: string): Promise<string> => {
+	let ret: string = "";
+
+	const c = collection(db, name_tagCollection)
+	const q = query(c, where("label", "==", label));
+	const doc: QuerySnapshot<DocumentData> = await getDocs(q);
+	
+	if (doc.size > 0)
+	{
+		ret = doc.docs[0].id;
+	}
+	else
+	{
+		ret = await db_createNewTag(label, '#333');
+	}
+	
+	return ret;
 }
 
 const makeTagByMetaInfo = (url: string, info: any): Array<string> => {

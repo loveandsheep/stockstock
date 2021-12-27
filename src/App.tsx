@@ -1,6 +1,8 @@
 import React from 'react';
 import CardView from './view/CardView';
 import { createTheme, ThemeProvider} from '@mui/material/styles';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AddQueryView from './view/AddQueryView';
 
 const theme = createTheme({
   palette: {
@@ -24,7 +26,12 @@ function App() {
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 
         <ThemeProvider theme={theme}>
-          <CardView />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<CardView />} />
+              <Route path="/add" element={<AddQueryView/>} />
+            </Routes>
+          </BrowserRouter>
         </ThemeProvider>
       </header>
     </div>

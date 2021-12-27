@@ -1,10 +1,10 @@
-import { Grid, AppBar, Toolbar, Modal, Dialog } from '@mui/material';
+import { Grid, AppBar, Toolbar, Button } from '@mui/material';
 import * as React from 'react';
 import ItemCard, { IItemCardProps } from './ItemCard';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
-import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItems, formatDate} from '../util/database'
+import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItems, db_getTag, db_getTagLabel, formatDate} from '../util/database'
 import { DocumentData, QuerySnapshot } from 'firebase/firestore';
 import CreateCardModalView from './CreateCardModalView';
 import { IronTwoTone } from '@mui/icons-material';
@@ -62,10 +62,31 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			cards: [],
 		}, () => {
 			db_getItems().then((query) => {
-				query.forEach((doc) => {
-					this.pushCard(doc.data(), doc.id);
-				})
+				this.pushCardMult(query);
 			});	
+		})
+	}
+
+	pushCardMult = (query: QuerySnapshot<DocumentData>) => {
+		let cardArr: Array<React.ReactElement> = [];
+		query.forEach((doc) => {
+			const newCard: React.ReactElement = (
+				<ItemCard 
+				title={doc.data().title} 
+				detail={doc.data().detail}
+				tags={doc.data().tags}
+				thumb={doc.data().thumb}
+				key={doc.id}
+				itemId={doc.id}
+				url={doc.data().url}
+				date={formatDate(new Date(doc.data().date.toDate()), "yyyy.MM.dd-HH:mm:ss")}
+				deleteAction={this.openDeleteModal}
+			/>
+			);
+			cardArr.push(newCard);
+		})
+		this.setState({
+			cards: cardArr.concat(this.state.cards),
 		})
 	}
 
@@ -120,10 +141,23 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	};
 	closeDeleteModal = () => {this.setState({deleteModal: false})};
 
+	testMethod = () => {
+		db_getTag("Houdini").then((id) => {
+			console.log(id);
+		})
+
+		db_getTagLabel("xbvThOvIyZNlqqi6FBKb").then((label) => {
+			console.log("label :" + label);
+		});
+
+		
+	}
+
 	public render() {
 
 		return (
 			<div>
+			<Button onClick={this.testMethod} >test</Button>
 				<DeleteCardModalView
 					open={this.state.deleteModal}
 					onClose={this.closeDeleteModal}
@@ -134,6 +168,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 					open={this.state.createModal} 
 					onClose={this.closeCreateModal}
 					onNewCard={this.pushCard}
+					defaultUrl=''
 				/>
 
 			<Grid container>
@@ -151,6 +186,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			<StyledFab color="secondary" aria-label="add" onClick={this.openCreateModal}>
 				<AddIcon  />
 			</StyledFab>
+
 			</Toolbar>
 			</AppBar>
 			</div>
