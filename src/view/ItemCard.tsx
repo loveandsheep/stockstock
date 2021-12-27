@@ -18,24 +18,19 @@ export type tagInfo = {
  *
  */
 export type cardInfo = {
+	itemId: string,
 	title: string,
 	detail: string,
 	tags: Array<tagInfo>,
 	thumb: string,
 	thumbRef: string,
-	itemId: string,
 	date: string,
 	url: string, 
 }
 
 export type IItemCardProps = {
-	title: string,
-	detail: string,
-	tags: Array<tagInfo>,
-	thumb: string,
-	itemId: string,
-	date: string,
-	url: string,
+	card: cardInfo,
+	detailAction: (id: any, card: cardInfo) => void,
 	deleteAction: (id: any, title: string) => void,
 }
 
@@ -52,10 +47,10 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 		super(props);
 
 		this.state = {
-			title: props.title,
-			detail: props.detail,
-			thumb: props.thumb,
-			tags: props.tags,
+			title: props.card.title,
+			detail: props.card.detail,
+			thumb: props.card.thumb,
+			tags: props.card.tags,
 		}
 	}
 
@@ -92,7 +87,7 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							component="img"
 							height="150"
 							image={this.state.thumb}
-							onClick={() => this.openInNewTab(this.props.url)}
+							onClick={() => this.openInNewTab(this.props.card.url)}
 						/>
 					</CardActionArea>
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -104,7 +99,7 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 								{this.state.detail}
 							</Typography>
 							<Typography variant='caption' style={{color: '#999999'}}>
-								{this.props.date}
+								{this.props.card.date}
 							</Typography>
 
 						</CardContent>
@@ -120,11 +115,13 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 								<IconButton aria-label="edit" size="small">
 									<EditIcon fontSize="inherit" />
 								</IconButton>
-								<IconButton aria-label="fullSize" size="small">
+								<IconButton aria-label="fullSize" size="small"
+									onClick={() => this.props.detailAction(this.props.card.itemId, this.props.card)}
+								>
 									<FullScreenIcon fontSize="inherit" />
 								</IconButton>
 								<IconButton aria-label="delete" size="small"
-									onClick={() => this.props.deleteAction(this.props.itemId, this.props.title)}
+									onClick={() => this.props.deleteAction(this.props.card.itemId, this.props.card.title)}
 								>
 									<DeleteIcon fontSize="inherit" />
 								</IconButton>

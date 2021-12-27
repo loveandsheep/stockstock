@@ -1,4 +1,4 @@
-import { Dialog } from '@mui/material';
+import { Card, Typography, CardContent, CardMedia, Dialog } from '@mui/material';
 import * as React from 'react';
 import { cardInfo, tagInfo } from '../view/ItemCard';
 
@@ -26,7 +26,20 @@ export default class ItemDetailView extends React.Component<IItemDetailViewProps
     public render() {
         return (
         <Dialog open={this.props.open} onClose={this.props.onClose} maxWidth='lg'>
-            ItemDetailView
+            <Card>
+                <CardMedia 
+                    component="img"
+                    image={this.props.card.thumb}
+                />
+                <CardContent>
+                    <Typography variant='h6'>
+                        {this.props.card.title}
+                    </Typography>
+                    <Typography variant="caption">
+                        {this.props.card.detail}
+                    </Typography>
+                </CardContent>
+            </Card>
         </Dialog>
         );
     }

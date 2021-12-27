@@ -97,17 +97,22 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	 * @memberof CardView
 	 */
 	cardFromDocumentData = (data: DocumentData, id: string):React.ReactElement => {
+		const ci: cardInfo = {
+			title: data.title,
+			detail: data.detail,
+			tags: this.getTagObjList(data.tags),
+			thumb: data.thumb,
+			thumbRef: data.thumbRef,
+			itemId: id,
+			url: data.url,
+			date: formatDate(new Date(data.date.toDate()), "yyyy.MM.dd HH:mm:ss")
+		}
 		return (
 			<ItemCard 
-			title={data.title} 
-			detail={data.detail}
-			tags={this.getTagObjList(data.tags)}
-			thumb={data.thumb}
 			key={id}
-			itemId={id}
-			url={data.url}
-			date={formatDate(new Date(data.date.toDate()), "yyyy.MM.dd-HH:mm:ss")}
 			deleteAction={this.openDeleteModal}
+			detailAction={this.openDetailModal}
+			card={ci}
 		/>
 		)
 	}
@@ -171,7 +176,8 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 
 	openCreateModal = () => {this.setState({createModal: true});};
 	closeCreateModal = () => {this.setState({createModal: false})};
-	closeDetailModal = () => {this.setState({detailModal: true})};
+	closeDetailModal = () => {this.setState({detailModal: false})};
+	
 	openDetailModal = (id: any, card: cardInfo) => {
 		id = id;
 		this.setState({
@@ -179,6 +185,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			detailCard: card,
 		});
 	}
+	
 	openDeleteModal = (id: any, title: string) => {
 		this.setState({
 			deleteModal: true,
