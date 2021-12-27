@@ -7,11 +7,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FullScreenIcon from '@mui/icons-material/Fullscreen';
 
+export type tagInfo = {
+	color: string,
+	label: string,
+	id: string,
+}
 
 export type IItemCardProps = {
 	title: string,
 	detail: string,
-	tags: Array<string>,
+	tags: Array<tagInfo>,
 	thumb: string,
 	itemId: string,
 	date: string,
@@ -22,7 +27,7 @@ export type IItemCardProps = {
 type IItemCardState = {
 	title: string,
 	detail: string,
-	tags: Array<string>,
+	tags: Array<tagInfo>,
 	thumb: string,
 }
 
@@ -92,8 +97,8 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 						<CardActions style={{display: 'flex', flexDirection: 'column'}}>
 							<Box style={{width: '100%'}}>
 								{this.state.tags ? 
-								this.state.tags.map(((tag: string) => 
-									<Chip style={{margin: '2px'}} key={tag} label={tag} size="small" color='primary'/>
+								this.state.tags.map(((tag: tagInfo, index) => 
+									<Chip style={{margin: '2px', background: tag.color}} key={index} label={tag.label} size="small" color='primary'/>
 								)) : <></>}
 							</Box>
 							<Box style={{width: '100%', display: 'flex', justifyContent: 'right'}}>

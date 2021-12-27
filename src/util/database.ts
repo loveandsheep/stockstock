@@ -70,7 +70,7 @@ export const db_createNewCardFromURL = async (url: string): Promise<string> => {
 	console.log(JSON.stringify(meta));
 	console.log("Image :" + meta[url]['og:image']);
 
-	const tags = makeTagByMetaInfo(url, meta[url]);
+	const tags = await makeTagByMetaInfo(url, meta[url]);
 
 	const now = Timestamp.fromDate(new Date());
 	const docRef = await addDoc(collection(db, name_collection), {
@@ -107,6 +107,7 @@ export const db_createFromURL = async (url: string): Promise<any> => {
  */
 const db_createNewTag = async(label: string, color: string): Promise<any> => {
 
+	console.log("label: "+ label);
 	const docRef = await addDoc(collection(db, name_tagCollection), {
 		label: label,
 		color: color,
@@ -120,7 +121,7 @@ const db_createNewTag = async(label: string, color: string): Promise<any> => {
  * タグの一覧を取得
  * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
  */
-const db_getTagList = async(): Promise<QuerySnapshot<DocumentData> > => {
+export const db_getTagList = async(): Promise<QuerySnapshot<DocumentData> > => {
 	const c = collection(db, name_tagCollection);
 	const q = query(c);
 	const qsn = await getDocs(q);
@@ -142,7 +143,7 @@ export const db_getTagLabel = async(id: string): Promise<string> => {
 
 /**
  *
- * ラベルからタグのドキュメントを探索
+ * ラベル名からタグのドキュメントを探索してIDを返す。該当が無ければ新規に発行してIDを返す
  * @param {string} label
  * @return {Primise<string>} - ドキュメントID
  */
@@ -165,17 +166,37 @@ export const db_getTag = async(label: string): Promise<string> => {
 	return ret;
 }
 
-const makeTagByMetaInfo = (url: string, info: any): Array<string> => {
+/**
+ *
+ * URLからタグを推測してIDの一覧を発行
+ * @param {string} url
+ * @param {*} info
+ * @return {*}  {Array<string>}
+ */
+const makeTagByMetaInfo = async(url: string, info: any): Promise<Array<string> > => {
 	let ret: Array<string> = [];
+	let tagNames: Array<string> = [];
 
-	if (url.match(/youtu\.be/)) ret.push('YouTube');
-	else if (url.match(/youtube/)) ret.push('YouTube');
+	if (url.match(/youtu\.be/)) tagNames.push('YouTube');
+	else if (url.match(/youtube/)) tagNames.push('YouTube');
 	
-	if (info['og:description'].match(/tutorial/)) ret.push('Tutorial');
-	else if (info['og:description'].match(/entagma/)) ret.push('Tutorial');
+	if (url.match(/twitter/)) tagNames.push('Twitter');
 	
-	if (info['og:description'].match(/Houdini/)) ret.push('Houdini');
+	if (info['og:description'].match(/tutorial/)) tagNames.push('Tutorial');
+	else if (info['og:description'].match(/entagma/)) tagNames.push('Tutorial');
 	
+	if (info['og:description'].match(/Houdini/)) tagNames.push('Houdini');
+	else if (info['og:title'].match(/Houdini/)) tagNames.push('Houdini');
+	
+	console.log("length:" + tagNames.length)
+	console.log(tagNames);
+	for (var tag of tagNames)
+	{
+		console.log(tag);
+		const retId = await db_getTag(tag);
+		ret.push(retId);
+	}
+	console.log(ret);
 	return ret;
 }
 
