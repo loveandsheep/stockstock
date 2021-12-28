@@ -2,6 +2,7 @@ import { Box, Chip, Card, Typography, CardContent, CardMedia, Dialog, CardAction
 import * as React from 'react';
 import { cardInfo, tagInfo } from '../view/ItemCard';
 import DetailEditor from './DetailEditorComponent';
+import { useState } from 'react';
 
 export interface IItemDetailViewProps {
     card: cardInfo,
@@ -9,82 +10,67 @@ export interface IItemDetailViewProps {
     onClose: VoidFunction,
 }
 
-export interface IItemDetailViewState {
-    tempCard: cardInfo, //編集した情報を保存しておく
-}
 
-export default class ItemDetailView extends React.Component<IItemDetailViewProps, IItemDetailViewState> {
-    constructor(props: IItemDetailViewProps) {
-        super(props);
+export default function ItemDetailView (props: IItemDetailViewProps) {
 
-        this.state = {
-            tempCard: this.props.card,
-        }
-    }
+    const [tempCard, setCard] = useState(props.card);
 
-    changeTitle = (value: string) => {
-        const nc: cardInfo = this.state.tempCard;
+    React.useEffect(() => {
+        setCard(props.card);
+    }, [props.card]);
+
+    const changeTitle = (value: string) => {
+        const nc: cardInfo = tempCard;
         nc.title = value;
-        this.setState({tempCard: nc});
-    }
-    changeDetail = (value: string) => {
-        const nc: cardInfo = this.state.tempCard;
-        nc.detail = value;
-        this.setState({tempCard: nc});
-    }
-    
-    componentDidUpdate() {
+        setCard(nc);
     }
 
-    public render() {
-        return (
-        <Dialog open={this.props.open} onClose={this.props.onClose} maxWidth='lg'>
+    const changeDetail = (value: string) => {
+        const nc: cardInfo = tempCard;
+        nc.detail = value;
+        setCard(nc);
+    }
+
+
+    return (
+        <Dialog open={props.open} onClose={props.onClose} maxWidth='lg'>
             <Card>
                 <CardMedia 
                     component="img"
                     height={250}
-                    image={this.props.card.thumb}
+                    image={props.card.thumb}
                 />
                 <CardContent>
                         
                     <DetailEditor 
-                        onChange={this.changeTitle}
-                        default = {this.state.tempCard.title}
+                        onChange={changeTitle}
+                        default = {tempCard.title}
                         label = {'title'}
                         multiline = {false}
-                        element = {(
-                            <Typography variant='h6'>
-                            {this.state.tempCard.title}
-                            </Typography>        
-                        )}
+                        variant='h6'
                     />
                     <DetailEditor
-                        onChange={this.changeDetail}
-                        default = {this.state.tempCard.detail}
+                        onChange={changeDetail}
+                        default = {tempCard.detail}
                         label = {'detail'}
                         multiline = {true}
-                        element = {(
-                            <Typography variant="caption">
-                            {this.state.tempCard.detail}
-                            </Typography>    
-                        )}
+                        variant='caption'
                     />
 
 
                 </CardContent>
                 <Box style={{marginLeft: '10px', marginRight: '10px'}}>
-								{this.props.card.tags ? 
-								this.props.card.tags.map(((tag: tagInfo, index) => 
+								{tempCard.tags ? 
+								tempCard.tags.map(((tag: tagInfo, index) => 
 									<Chip 
                                         style={{margin: '2px', background: tag.color}} key={index} label={tag.label} size="small" color='primary'/>
 								)) : <></>}
                 </Box>
                 <CardActions style={{display: 'flex', justifyContent: 'right'}}>
-                    <Button variant='outlined' size='small' onClick={this.props.onClose}>Cancel</Button>
+                    <Button variant='outlined' size='small' onClick={props.onClose}>Cancel</Button>
                     <Button variant='contained' color='primary' size='small'>Save</Button>
                 </CardActions>
             </Card>
         </Dialog>
-        );
-    }
-}
+    );
+};

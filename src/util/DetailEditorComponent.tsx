@@ -1,11 +1,11 @@
 import { Box, flexbox } from '@mui/system';
-import { IconButton, TextField } from '@mui/material';
+import { IconButton, TextField, Typography } from '@mui/material';
 import * as React from 'react';
 import { useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 
 export interface IDetailEditorProps {
-    element: React.ReactElement,
+    variant: "button" | "caption" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "inherit" | "subtitle1" | "subtitle2" | "body1" | "body2" | "overline" | undefined,
     onChange: (value: string) => void,
     default: string,
     label: string,
@@ -55,7 +55,11 @@ export default function DetailEditor (props: IDetailEditorProps) {
                 onChange={textChange}
                 multiline={props.multiline}
                 autoFocus fullWidth/>
-                : props.element}
+                : 
+                <Typography variant={props.variant}>
+                    {text}
+                </Typography>
+                    }
                 
                 <Box style= {editButtonBoxStyle}>
                 {hover ? 
