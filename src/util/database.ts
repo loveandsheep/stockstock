@@ -67,10 +67,9 @@ export const db_createNewCardFromURL = async (url: string): Promise<string> => {
 	//TODO: OGPが無かった場合のフォロー
 	const meta = await db_createFromURL(url);
 
-	console.log(JSON.stringify(meta));
-	console.log("Image :" + meta[url]['og:image']);
-
 	const tags = await makeTagByMetaInfo(url, meta[url]);
+
+	if (meta[url]['og:description'] === undefined) meta[url]['og:description'] = '';
 
 	const now = Timestamp.fromDate(new Date());
 	const docRef = await addDoc(collection(db, name_collection), {
@@ -181,12 +180,15 @@ const makeTagByMetaInfo = async(url: string, info: any): Promise<Array<string> >
 	else if (url.match(/youtube/)) tagNames.push('YouTube');
 	
 	if (url.match(/twitter/)) tagNames.push('Twitter');
-	
-	if (info['og:description'].match(/tutorial/)) tagNames.push('Tutorial');
-	else if (info['og:description'].match(/entagma/)) tagNames.push('Tutorial');
-	
-	if (info['og:description'].match(/Houdini/)) tagNames.push('Houdini');
-	else if (info['og:title'].match(/Houdini/)) tagNames.push('Houdini');
+
+	if (info['og:description'] !== undefined && info['og:title'] !== undefined)
+	{
+		if (info['og:description'].match(/tutorial/)) tagNames.push('Tutorial');
+		else if (info['og:description'].match(/entagma/)) tagNames.push('Tutorial');
+		
+		if (info['og:description'].match(/Houdini/)) tagNames.push('Houdini');
+		else if (info['og:title'].match(/Houdini/)) tagNames.push('Houdini');	
+	}
 	
 	console.log("length:" + tagNames.length)
 	console.log(tagNames);
