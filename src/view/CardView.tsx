@@ -4,7 +4,7 @@ import ItemCard, { cardInfo, IItemCardProps, tagInfo } from './ItemCard';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
-import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItems, db_getTag, db_getTagLabel, db_getTagList, formatDate} from '../util/database'
+import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItem, db_getItems, db_getTag, db_getTagLabel, db_getTagList, formatDate} from '../util/database'
 import { DocumentData, QuerySnapshot } from 'firebase/firestore';
 import CreateCardModalView from './CreateCardModalView';
 import { IronTwoTone } from '@mui/icons-material';
@@ -14,8 +14,13 @@ import ItemDetailView from '../util/ItemDetailView';
 export interface ICardViewProps {
 }
 
+export type cardUnit = {
+	comp: React.ReactElement,
+	id: string,
+}
+
 interface ICardViewState {
-	cards: any,
+	cards: Array<cardUnit>,
 	createModal: boolean,
 	deleteModal: boolean,
 	detailModal: boolean,
@@ -96,25 +101,31 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	 * @param {string} id
 	 * @memberof CardView
 	 */
-	cardFromDocumentData = (data: DocumentData, id: string):React.ReactElement => {
+	cardFromDocumentData = (data: DocumentData, id: string):cardUnit => {
 		const ci: cardInfo = {
 			title: data.title,
 			detail: data.detail,
-			tags: this.getTagObjList(data.tags),
+			tags: data.tags,
+			tagArr: this.getTagObjList(data.tags),
 			thumb: data.thumb,
 			thumbRef: data.thumbRef,
 			itemId: id,
 			url: data.url,
-			date: formatDate(new Date(data.date.toDate()), "yyyy.MM.dd HH:mm:ss")
+			date: data.date,
+			dateView: formatDate(new Date(data.date.toDate()), "yyyy.MM.dd HH:mm:ss")
 		}
-		return (
-			<ItemCard 
-			key={id}
-			deleteAction={this.openDeleteModal}
-			detailAction={this.openDetailModal}
-			card={ci}
-		/>
-		)
+		const newUnit = {
+			id: id,
+			comp: (
+				<ItemCard 
+				key={id}
+				deleteAction={this.openDeleteModal}
+				detailAction={this.openDetailModal}
+				card={ci}
+				/>				
+			),
+		}
+		return newUnit;
 	}
 
 	/**
@@ -124,9 +135,9 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	 * @memberof CardView
 	 */
 	pushCardMult = (query: QuerySnapshot<DocumentData>) => {
-		let cardArr: Array<React.ReactElement> = [];
+		let cardArr: Array<cardUnit> = [];
 		query.forEach((doc) => {
-			const newCard: React.ReactElement = this.cardFromDocumentData(doc.data(), doc.id);
+			const newCard: cardUnit = this.cardFromDocumentData(doc.data(), doc.id);
 			cardArr.push(newCard);
 		})
 		this.setState({
@@ -144,6 +155,29 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		const newCard = [this.cardFromDocumentData(data, id)];
 		this.setState({
 			cards: newCard.concat(this.state.cards),
+		})
+	}
+
+	/**
+	 * カード情報をサーバーから再取得して更新する
+	 *
+	 * @param {string} id
+	 * @memberof CardView
+	 */
+	updateCard = (id: string) => {
+		db_getItem(id).then((data) => {
+			const newCard = this.cardFromDocumentData(data.data()!, id);
+			var index = this.state.cards.findIndex( (v) => v.id == id);
+
+			if (index >= 0)
+			{
+				var cardArr = this.state.cards.slice();
+				cardArr.splice(index, 1, newCard);
+				
+				this.setState({cards: []}, () => {
+					this.setState({cards: cardArr});
+				})
+			}
 		})
 	}
 
@@ -218,27 +252,28 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 					card={this.state.detailCard}
 					open={this.state.detailModal}
 					onClose={this.closeDetailModal}
+					onUpdate={this.updateCard}
 				/>
 				:
 				<></>
 			}
-				<DeleteCardModalView
-					open={this.state.deleteModal}
-					onClose={this.closeDeleteModal}
-					onDelete={this.deleteCard}
-					title={this.state.deleteTitle}
-				/>
-				<CreateCardModalView 
-					open={this.state.createModal} 
-					onClose={this.closeCreateModal}
-					onNewCard={this.pushCard}
-					defaultUrl=''
-				/>
+			<DeleteCardModalView
+				open={this.state.deleteModal}
+				onClose={this.closeDeleteModal}
+				onDelete={this.deleteCard}
+				title={this.state.deleteTitle}
+			/>
+			<CreateCardModalView 
+				open={this.state.createModal} 
+				onClose={this.closeCreateModal}
+				onNewCard={this.pushCard}
+				defaultUrl=''
+			/>
 
 			<Grid container>
-				{this.state.cards.map(((card: any, index: number) => 
+				{this.state.cards.map(((card: cardUnit, index: number) => 
 				<Grid item xs={12} md={4} lg={3} key={"grid" + index}>
-					{card}
+					{card.comp}
 				</Grid>
 				))}				
 			</Grid>

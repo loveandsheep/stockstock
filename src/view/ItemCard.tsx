@@ -6,6 +6,7 @@ import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FullScreenIcon from '@mui/icons-material/Fullscreen';
+import { Timestamp } from 'firebase/firestore';
 
 export type tagInfo = {
 	color: string,
@@ -21,10 +22,12 @@ export type cardInfo = {
 	itemId: string,
 	title: string,
 	detail: string,
-	tags: Array<tagInfo>,
+	tags: Array<string>,
+	tagArr: Array<tagInfo> | undefined,
 	thumb: string,
 	thumbRef: string,
-	date: string,
+	date: Timestamp,
+	dateView: string | undefined,
 	url: string, 
 }
 
@@ -37,7 +40,8 @@ export type IItemCardProps = {
 type IItemCardState = {
 	title: string,
 	detail: string,
-	tags: Array<tagInfo>,
+	tags: Array<string>,
+	tagArr: Array<tagInfo> | undefined,
 	thumb: string,
 }
 
@@ -51,6 +55,7 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 			detail: props.card.detail,
 			thumb: props.card.thumb,
 			tags: props.card.tags,
+			tagArr: props.card.tagArr,
 		}
 	}
 
@@ -99,15 +104,15 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 								{this.state.detail}
 							</Typography>
 							<Typography variant='caption' style={{color: '#999999'}}>
-								{this.props.card.date}
+								{this.props.card.dateView}
 							</Typography>
 
 						</CardContent>
 
 						<CardActions style={{display: 'flex', flexDirection: 'column'}}>
 							<Box style={{width: '100%'}}>
-								{this.state.tags ? 
-								this.state.tags.map(((tag: tagInfo, index) => 
+								{this.state.tagArr ? 
+								this.state.tagArr.map(((tag: tagInfo, index) => 
 									<Chip style={{margin: '2px', background: tag.color}} key={index} label={tag.label} size="small" color='primary'/>
 								)) : <></>}
 							</Box>

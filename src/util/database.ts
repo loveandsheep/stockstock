@@ -1,11 +1,13 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { DocumentData, getFirestore, QuerySnapshot } from "firebase/firestore"
+import { DocumentData, getFirestore, QuerySnapshot, updateDoc } from "firebase/firestore"
 import { collection, getDocs, addDoc, query, orderBy, limit, where, Timestamp } from "firebase/firestore";
 import axios from 'axios';
 import { getDoc } from 'firebase/firestore';
 import { doc } from 'firebase/firestore';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
+import { cardInfo } from '../view/ItemCard';
+import { createTypePredicateNodeWithModifier } from 'typescript';
 
 const name_collection = "items-stock";
 const name_tagCollection = "tags";
@@ -47,6 +49,19 @@ export const db_getItem = async (id: any): Promise<DocumentSnapshot<DocumentData
 	return qsn;
 }
 
+/**
+ * カード情報を更新する
+ *
+ * @param {cardInfo} card - id含む新たなカード情報
+ * @return {*}  {Promise<DocumentSnapshot<DocumentData> >}
+ */
+export const db_updateCard = async(card: cardInfo): Promise<void> => {
+	const id = card.itemId;
+	delete card.tagArr;
+	delete card.dateView;
+	const cardDoc = doc(db, name_collection, id);
+	return await updateDoc(cardDoc, card);
+}
 
 /**
  * アイテムの消去

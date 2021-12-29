@@ -36,7 +36,7 @@ export default function DetailEditor (props: IDetailEditorProps) {
 
     const editButtonBoxStyle = {
         width: '50px',
-        height: '30px',
+        height: '40px',
     }
 
     const onEnter = () => {setHover(true);}

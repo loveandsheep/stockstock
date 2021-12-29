@@ -27,7 +27,7 @@ function a11yProps(index: number) {
 export default class CreateCardModalView extends React.Component<ICreateCardModalViewProps, ICreateCardModalViewState> {
     constructor(props: ICreateCardModalViewProps) {
         super(props);
-
+        
         this.state = {
             tabSelect: 0,
             urlText: this.props.defaultUrl,
