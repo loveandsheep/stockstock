@@ -12,6 +12,11 @@ export interface IDetailEditorProps {
     multiline: boolean,
 }
 
+export const editButtonBoxStyle = {
+    width: '50px',
+    height: '40px',
+}
+
 export default function DetailEditor (props: IDetailEditorProps) {
 
     const [edit, setEdit] = useState(false);
@@ -34,10 +39,7 @@ export default function DetailEditor (props: IDetailEditorProps) {
         align: 'center',
     }
 
-    const editButtonBoxStyle = {
-        width: '50px',
-        height: '40px',
-    }
+
 
     const onEnter = () => {setHover(true);}
     const onRelease = () => {setHover(false);}

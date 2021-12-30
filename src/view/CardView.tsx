@@ -28,6 +28,7 @@ interface ICardViewState {
 	deleteTarget: string,
 	deleteTitle: string,
 	tagList: {[name: string]: tagInfo},
+	tagListArr: Array<string>,
 }
 
 const StyledFab = styled(Fab)({
@@ -55,6 +56,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			deleteTarget: '',
 			deleteTitle: '',
 			tagList: {},
+			tagListArr: [],
 		};
 	}
 
@@ -73,6 +75,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		}, () => {
 			db_getTagList().then((query) => {
 				const tagList: {[name: string]: tagInfo} = {};
+				const tagArr: Array<string> = [];
 				for (var doc of query.docs)
 				{
 					const newTag: tagInfo = { //カード一覧のクエリを元にタグのリストを作成
@@ -81,15 +84,39 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 						id: doc.id,
 					}
 					tagList[doc.id] = newTag;
+					tagArr.push(doc.data().label);
 				}
 
 				this.setState({
-					tagList: tagList //タグリストをstateに登録
+					tagList: tagList, //タグリストをstateに登録
+					tagListArr: tagArr,
 				}, () => {
 					db_getItems().then((query) => {//タグの取得完了後、カード一覧を取得
 						this.pushCardMult(query);
 					});
 				})
+			});
+		})
+	}
+
+	reloadTags = () => {
+		db_getTagList().then((query) => {
+			const tagList: {[name: string]: tagInfo} = {};
+			const tagArr: Array<string> = [];
+			for (var doc of query.docs)
+			{
+				const newTag: tagInfo = { //カード一覧のクエリを元にタグのリストを作成
+					label: doc.data().label,
+					color: doc.data().color,
+					id: doc.id,
+				}
+				tagList[doc.id] = newTag;
+				tagArr.push(doc.data().label);
+			}
+
+			this.setState({
+				tagList: tagList, //タグリストをstateに登録
+				tagListArr: tagArr,
 			});
 		})
 	}
@@ -253,6 +280,9 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 					open={this.state.detailModal}
 					onClose={this.closeDetailModal}
 					onUpdate={this.updateCard}
+					tagList={this.state.tagList}
+					tagListArr={this.state.tagListArr}
+					reloadTag={this.reloadTags}
 				/>
 				:
 				<></>
