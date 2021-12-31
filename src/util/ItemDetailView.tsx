@@ -53,10 +53,6 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
         })
     }
 
-    const tagDelete = () => {
-
-    }
-
     const tagCreate = async () => {
         if (tagEditFlag)
         {
@@ -64,7 +60,8 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
             newCard.tagArr = [];
             newCard.tags = [];
 
-            //TODO: 新しいタグが出てきた場合発行しないとダメ
+            let newTagExist = false;
+
             for (let tkey in tagEditor)
             {
                 const tag = tagEditor[tkey];
@@ -89,8 +86,11 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
                         id: newId,
                         color: '#333',
                     })
+                    newTagExist = true;
                 }
             }
+
+            if (newTagExist) props.reloadTag();
 
             setCard(newCard);
             setTagEditFlag(false);

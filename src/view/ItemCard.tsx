@@ -106,7 +106,6 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							<Typography variant='caption' style={{color: '#999999'}}>
 								{this.props.card.dateView}
 							</Typography>
-
 						</CardContent>
 
 						<CardActions style={{display: 'flex', flexDirection: 'column'}}>
