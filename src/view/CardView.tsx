@@ -10,6 +10,8 @@ import CreateCardModalView from './CreateCardModalView';
 import { IronTwoTone } from '@mui/icons-material';
 import DeleteCardModalView from './DeleteCardModal';
 import ItemDetailView from '../util/ItemDetailView';
+import { Box } from '@mui/system';
+import { myTheme } from '..';
 
 export interface ICardViewProps {
 }
@@ -270,9 +272,13 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 
 	public render() {
 
+		const gridStyle = {
+			display: 'flex',
+			padding: '7px',
+		};
+
 		return (
-			<div>
-			<Button onClick={this.testMethod} >test</Button>
+			<>
 			{
 				this.state.detailCard !== undefined ? 
 				<ItemDetailView 
@@ -300,9 +306,9 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 				defaultUrl=''
 			/>
 
-			<Grid container>
+			<Grid container pb={10} alignItems="stretch">
 				{this.state.cards.map(((card: cardUnit, index: number) => 
-				<Grid item xs={12} md={4} lg={3} key={"grid" + index}>
+				<Grid item xs={12} md={4} lg={3} key={"grid" + index} style={gridStyle}>
 					{card.comp}
 				</Grid>
 				))}				
@@ -312,13 +318,13 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			<AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
 			<Toolbar>
 
-			<StyledFab color="secondary" aria-label="add" onClick={this.openCreateModal}>
+			<StyledFab color="primary" aria-label="add" onClick={this.openCreateModal}>
 				<AddIcon  />
 			</StyledFab>
 
 			</Toolbar>
 			</AppBar>
-			</div>
+			</>
 		);
 	}
 }

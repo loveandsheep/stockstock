@@ -3,10 +3,38 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { createTheme, ThemeProvider} from '@mui/material/styles';
+import { Box } from '@mui/system';
+
+export const myTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#629998',//'#395664',
+    },
+    secondary: {
+      main: '#a65d4a',
+    },
+    info: {
+      main: '#999999',
+    },
+    error: {
+      main: '#e0625a',
+    },
+    background: {
+      default: '#313131',
+      paper: '#393939',
+    },
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={myTheme}>
+      <Box style={{background: myTheme.palette.background.default}}>
+        <App/>
+      </Box>
+    </ThemeProvider>  
   </React.StrictMode>,
   document.getElementById('root')
 );

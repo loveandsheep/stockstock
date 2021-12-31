@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FullScreenIcon from '@mui/icons-material/Fullscreen';
 import { Timestamp } from 'firebase/firestore';
+import { myTheme } from '..';
 
 export type tagInfo = {
 	color: string,
@@ -65,12 +66,20 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 	}
 
 	public render() {
+
+		const cardBox = {
+			maxWidth: '100%',
+			flexGrow: '1',
+		}
+
 		const cardStyle = {
-			margin: '10px',
-			borderRadius: '10px',
+			width: '100%',
+			height: '100%',
+			borderRadius: '20px',
 		}
 
 		const style_title = {
+			color: myTheme.palette.text.secondary,
 			display: 'block',
 			textOverflow: 'ellipsis',
 			whiteSpace: 'nowrap',
@@ -78,14 +87,15 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 		} as React.CSSProperties;
 
 		const style_detail = {
+			color: myTheme.palette.text.secondary,
 			display: '-webkit-box',
 			WebkitBoxOrient: 'vertical',
-			WebkitLineClamp: 3,
+			WebkitLineClamp: 1,
 			overflow: 'hidden',		
 		} as React.CSSProperties;
 
 		return (
-			<div>
+			<Box style={cardBox}>
 				<Card style={cardStyle}>
 					<CardActionArea>
 						<CardMedia
@@ -95,7 +105,7 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							onClick={() => this.openInNewTab(this.props.card.url)}
 						/>
 					</CardActionArea>
-					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent:'end'}}>
 						<CardContent>
 							<Typography style={style_title} variant='h6'>
 								{this.state.title}
@@ -115,16 +125,13 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 									<Chip style={{margin: '2px', background: tag.color}} key={index} label={tag.label} size="small" color='primary'/>
 								)) : <></>}
 							</Box>
-							<Box style={{width: '100%', display: 'flex', justifyContent: 'right'}}>
-								<IconButton aria-label="edit" size="small">
-									<EditIcon fontSize="inherit" />
-								</IconButton>
-								<IconButton aria-label="fullSize" size="small"
+							<Box style={{width: '100%', display: 'flex', justifyContent: 'right', marginTop: 'auto'}}>
+								<IconButton aria-label="fullSize" color='info' size="medium"
 									onClick={() => this.props.detailAction(this.props.card.itemId, this.props.card)}
 								>
 									<FullScreenIcon fontSize="inherit" />
 								</IconButton>
-								<IconButton aria-label="delete" size="small"
+								<IconButton aria-label="delete" color='info' size="medium"
 									onClick={() => this.props.deleteAction(this.props.card.itemId, this.props.card.title)}
 								>
 									<DeleteIcon fontSize="inherit" />
@@ -133,7 +140,7 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 						</CardActions>
 					</Box>
 				</Card>
-			</div>
+			</Box>
 		);
 	}
 }
