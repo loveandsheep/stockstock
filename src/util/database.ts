@@ -1,5 +1,5 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { DocumentData, getFirestore, QuerySnapshot, updateDoc } from "firebase/firestore"
+import { DocumentData, getFirestore, QueryConstraint, QuerySnapshot, updateDoc } from "firebase/firestore"
 import { collection, getDocs, addDoc, query, orderBy, limit, where, Timestamp } from "firebase/firestore";
 import axios from 'axios';
 import { getDoc } from 'firebase/firestore';
@@ -32,10 +32,13 @@ export const db_initialize = () => {
  *　コレクションからカードの一覧を取得
  * @return {*}  {Promise<QuerySnapshot<DocumentData> >}
  */
-export const db_getItems = async (): Promise<QuerySnapshot<DocumentData> > => {
-	const q = query(collection(db, name_collection), orderBy('date', 'desc'), limit(100));//or desc
+export const db_getItems = async (_whereQuery: QueryConstraint): Promise<QuerySnapshot<DocumentData> > => {
+	
+	const q = query(collection(db, name_collection), orderBy('date', 'desc'), limit(100), _whereQuery);
+	
 	const qsn = await getDocs(q);
 	return qsn;
+	
 }
 
 /**

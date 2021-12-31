@@ -1,17 +1,20 @@
-import { Grid, AppBar, Toolbar, Button } from '@mui/material';
+import { Grid, AppBar, Toolbar, Button, IconButton, Chip } from '@mui/material';
 import * as React from 'react';
 import ItemCard, { cardInfo, IItemCardProps, tagInfo } from './ItemCard';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
 import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItem, db_getItems, db_getTag, db_getTagLabel, db_getTagList, formatDate} from '../util/database'
-import { DocumentData, QuerySnapshot } from 'firebase/firestore';
+import { DocumentData, limit, query, QueryConstraint, QuerySnapshot, where } from 'firebase/firestore';
 import CreateCardModalView from './CreateCardModalView';
 import { IronTwoTone } from '@mui/icons-material';
 import DeleteCardModalView from './DeleteCardModal';
 import ItemDetailView from '../util/ItemDetailView';
 import { Box } from '@mui/system';
 import { myTheme } from '..';
+import { Autocomplete, TextField } from '@mui/material';
+import { Search } from '@mui/icons-material';
+import SearchModalView from '../util/SearchModalView';
 
 export interface ICardViewProps {
 }
@@ -19,18 +22,6 @@ export interface ICardViewProps {
 export type cardUnit = {
 	comp: React.ReactElement,
 	id: string,
-}
-
-interface ICardViewState {
-	cards: Array<cardUnit>,
-	createModal: boolean,
-	deleteModal: boolean,
-	detailModal: boolean,
-	detailCard: cardInfo,
-	deleteTarget: string,
-	deleteTitle: string,
-	tagList: {[name: string]: tagInfo},
-	tagListArr: Array<string>,
 }
 
 const StyledFab = styled(Fab)({
@@ -41,6 +32,21 @@ const StyledFab = styled(Fab)({
 	right: 0,
 	margin: '0 auto',
 });
+
+interface ICardViewState {
+	cards: Array<cardUnit>,
+	createModal: boolean,
+	deleteModal: boolean,
+	detailModal: boolean,
+	searchModal: boolean,
+	detailCard: cardInfo,
+	deleteTarget: string,
+	deleteTitle: string,
+	tagList: {[name: string]: tagInfo},
+	tagListArr: Array<string>,
+	query: QueryConstraint,
+	filterTagList: Array<string>,
+}
 
 /**
  * カードの一覧を表示するためのクラス
@@ -54,11 +60,14 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			createModal: false,
 			deleteModal: false,
 			detailModal: false,
+			searchModal: false,
 			detailCard: undefined!,
 			deleteTarget: '',
 			deleteTitle: '',
 			tagList: {},
 			tagListArr: [],
+			query: where("tags", "array-contains", "8eBiQ9hKe1hJcwic1H4Z"),
+			filterTagList: [],
 		};
 	}
 
@@ -93,7 +102,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 					tagList: tagList, //タグリストをstateに登録
 					tagListArr: tagArr,
 				}, () => {
-					db_getItems().then((query) => {//タグの取得完了後、カード一覧を取得
+					db_getItems(this.state.query).then((query) => {//タグの取得完了後、カード一覧を取得
 						this.pushCardMult(query);
 					});
 				})
@@ -122,6 +131,41 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			});
 		})
 	}
+
+	setTagPreset = (name: string) => {
+		for (let key in this.state.tagList)
+		{
+			if (this.state.tagList[key].label == name)
+			{
+				this.setTagFilter([key]);
+			}
+		}
+	}
+
+	setTagFilter = (tagId: Array<string>) => {
+		if (tagId.length > 0)
+		{
+			this.setState({
+				filterTagList: tagId,
+				query: where("tags", "array-contains", tagId[0]),
+			}, () => {
+
+				this.reloadCards();
+
+			});	
+		}
+		else
+		{
+			this.setState({
+				filterTagList: [],
+				query: limit(1000),
+			}, () => {
+
+				this.reloadCards();
+
+			});	
+		}
+	};
 
 	/**
 	 * アイテム情報からカードのReactElementを作る
@@ -240,6 +284,8 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	openCreateModal = () => {this.setState({createModal: true});};
 	closeCreateModal = () => {this.setState({createModal: false})};
 	closeDetailModal = () => {this.setState({detailModal: false})};
+	openSearchModal = () => {this.setState({searchModal: true})};
+	closeSearchModal = () => {this.setState({searchModal: false})};
 	
 	openDetailModal = (id: any, card: cardInfo) => {
 		id = id;
@@ -293,6 +339,13 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 				:
 				<></>
 			}
+			<SearchModalView 
+				open={this.state.searchModal}
+				onClose={this.closeSearchModal}
+				doSearch={this.setTagFilter}
+				tagList={this.state.tagList}
+				tagListArr={this.state.tagListArr}
+			/>
 			<DeleteCardModalView
 				open={this.state.deleteModal}
 				onClose={this.closeDeleteModal}
@@ -316,11 +369,21 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 
 
 			<AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
-			<Toolbar>
+
+			<Toolbar style={{display: 'flex', justifyContent: 'flex-end'}}>
 
 			<StyledFab color="primary" aria-label="add" onClick={this.openCreateModal}>
 				<AddIcon  />
 			</StyledFab>
+			
+			<Chip style={{margin: '2px'}} label='silky' onClick={() => {this.setTagPreset('silky')}} />
+			<Chip style={{margin: '2px'}} label='未読' onClick={() => {this.setTagPreset('未読')}} />
+			<Chip style={{margin: '2px'}} label='アート' onClick={() => {this.setTagPreset('アート')}} />
+			<Chip style={{margin: '2px'}} label='ガジェット' onClick={() => {this.setTagPreset('ガジェット')}} />
+			<Chip style={{margin: '2px'}} label='すべて' onClick={() => {this.setTagFilter([])}} />
+			<IconButton onClick={this.openSearchModal}>
+					<Search />
+			</IconButton>
 
 			</Toolbar>
 			</AppBar>

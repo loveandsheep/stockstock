@@ -31,7 +31,7 @@ export const myTheme = createTheme({
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={myTheme}>
-      <Box style={{background: myTheme.palette.background.default}}>
+      <Box style={{minHeight: '100vh', background: myTheme.palette.background.default}}>
         <App/>
       </Box>
     </ThemeProvider>  

@@ -44,7 +44,8 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
         setCard(nc);
     }
 
-    const saveCardInformation = () => {
+    const saveCardInformation = async () => {
+        if (tagEditFlag) await tagCreate();
         setSaving(true);
         db_updateCard(tempCard).then(() => {
             props.onUpdate(tempCard.itemId);
@@ -102,6 +103,11 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
             setTagEditor(tagNameArr);
             setTagEditFlag(true);
         }
+    }
+
+    const cancelEdit = () => {
+        setTagEditFlag(false);
+        props.onClose();
     }
 
 
@@ -174,7 +180,7 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
                 }
 
                 <CardActions style={{ display: 'flex', justifyContent: 'right' }}>
-                    <Button variant='outlined' size='small' onClick={props.onClose}>Cancel</Button>
+                    <Button variant='outlined' size='small' onClick={cancelEdit}>Cancel</Button>
                     <Button variant='contained' color='primary' size='small' onClick={saveCardInformation} disabled={saving}>
                         {saving ?
                             <CircularProgress size={30} thickness={6} />
