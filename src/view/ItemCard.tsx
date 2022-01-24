@@ -105,7 +105,9 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 				<Card style={cardStyle}>
 					<CardActionArea>
 						{this.props.card.thumbRef == 'color' ? 
-						<CardHeader style={style_header}/> :
+						<CardHeader style={style_header}
+							onClick={() => this.openInNewTab(this.props.card.url)}
+						/> :
 						<CardMedia
 							component="img"
 							height="150"

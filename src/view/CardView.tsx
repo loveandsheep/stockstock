@@ -66,7 +66,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			deleteTitle: '',
 			tagList: {},
 			tagListArr: [],
-			query: where("tags", "array-contains", "8eBiQ9hKe1hJcwic1H4Z"),
+			query: where("tags", "array-contains", "KeyKQqq2ngj3TWOrlynP"),
 			filterTagList: [],
 		};
 	}
