@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Card from '@mui/material/Card'
-import { Button, Box, Chip, CardActionArea } from '@mui/material';
+import { Button, Box, Chip, CardActionArea, CardHeader } from '@mui/material';
 import { CardContent, CardActions, CardMedia, Typography } from '@mui/material';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -36,6 +36,7 @@ export type IItemCardProps = {
 	card: cardInfo,
 	detailAction: (id: any, card: cardInfo) => void,
 	deleteAction: (id: any, title: string) => void,
+	setTagPreset: (name: string) => void,
 }
 
 type IItemCardState = {
@@ -94,16 +95,25 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 			overflow: 'hidden',		
 		} as React.CSSProperties;
 
+		const style_header = {
+			background: this.props.card.thumb,
+			height: '120px',
+		}
+
 		return (
 			<Box style={cardBox}>
 				<Card style={cardStyle}>
 					<CardActionArea>
+						{this.props.card.thumbRef == 'color' ? 
+						<CardHeader style={style_header}/> :
 						<CardMedia
 							component="img"
 							height="150"
 							image={this.state.thumb}
 							onClick={() => this.openInNewTab(this.props.card.url)}
 						/>
+						}
+						
 					</CardActionArea>
 					<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent:'end'}}>
 						<CardContent>
@@ -122,7 +132,11 @@ export default class ItemCard extends React.Component<IItemCardProps, IItemCardS
 							<Box style={{width: '100%'}}>
 								{this.state.tagArr ? 
 								this.state.tagArr.map(((tag: tagInfo, index) => 
-									<Chip style={{margin: '2px', background: tag.color}} key={index} label={tag.label} size="small" color='primary'/>
+									<Chip 
+										style={{margin: '2px', background: tag.color}} 
+										key={index} label={tag.label} size="small" color='primary'
+										onClick={() => this.props.setTagPreset(tag.label)}
+										/>
 								)) : <></>}
 							</Box>
 							<Box style={{width: '100%', display: 'flex', justifyContent: 'right', marginTop: 'auto'}}>

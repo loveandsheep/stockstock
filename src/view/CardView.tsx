@@ -4,7 +4,7 @@ import ItemCard, { cardInfo, IItemCardProps, tagInfo } from './ItemCard';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
-import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItem, db_getItems, db_getTag, db_getTagLabel, db_getTagList, formatDate} from '../util/database'
+import {db_createFromURL, db_createNewCardFromURL, db_deleteItem, db_getItem, db_getItems, db_getTag, db_getTagLabel, db_getTagList, formatDate, req_kabutan} from '../util/database'
 import { DocumentData, limit, query, QueryConstraint, QuerySnapshot, where } from 'firebase/firestore';
 import CreateCardModalView from './CreateCardModalView';
 import { IronTwoTone } from '@mui/icons-material';
@@ -132,6 +132,12 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 		})
 	}
 
+	/**
+	 * 単一のタグフィルタ
+	 *
+	 * @param {string} name
+	 * @memberof CardView
+	 */
 	setTagPreset = (name: string) => {
 		for (let key in this.state.tagList)
 		{
@@ -194,6 +200,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 				key={id}
 				deleteAction={this.openDeleteModal}
 				detailAction={this.openDetailModal}
+				setTagPreset={this.setTagPreset}
 				card={ci}
 				/>				
 			),
@@ -305,15 +312,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	closeDeleteModal = () => {this.setState({deleteModal: false})};
 
 	testMethod = () => {
-		db_getTag("Houdini").then((id) => {
-			console.log(id);
-		})
-
-		db_getTagLabel("xbvThOvIyZNlqqi6FBKb").then((label) => {
-			console.log("label :" + label);
-		});
-
-		
+		req_kabutan(1010);
 	}
 
 	public render() {
@@ -325,6 +324,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 
 		return (
 			<>
+			<Button onClick={this.testMethod}>TEST</Button>
 			{
 				this.state.detailCard !== undefined ? 
 				<ItemDetailView 
@@ -380,6 +380,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 			<Chip style={{margin: '2px'}} label='未読' onClick={() => {this.setTagPreset('未読')}} />
 			<Chip style={{margin: '2px'}} label='アート' onClick={() => {this.setTagPreset('アート')}} />
 			<Chip style={{margin: '2px'}} label='ガジェット' onClick={() => {this.setTagPreset('ガジェット')}} />
+			<Chip style={{margin: '2px'}} label='未整理' onClick={() => {this.setTagPreset('未整理')}} />
 			<Chip style={{margin: '2px'}} label='すべて' onClick={() => {this.setTagFilter([])}} />
 			<IconButton onClick={this.openSearchModal}>
 					<Search />

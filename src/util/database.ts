@@ -86,6 +86,8 @@ export const db_createNewCardFromURL = async (url: string): Promise<string> => {
 	const meta = await db_createFromURL(url);
 
 	const tags = await makeTagByMetaInfo(url, meta[url]);
+	const newTag = await db_getTag('未整理');
+	tags.push(newTag);
 
 	if (meta[url]['og:description'] === undefined) meta[url]['og:description'] = '';
 
@@ -208,15 +210,12 @@ const makeTagByMetaInfo = async(url: string, info: any): Promise<Array<string> >
 		else if (info['og:title'].match(/Houdini/)) tagNames.push('Houdini');	
 	}
 	
-	console.log("length:" + tagNames.length)
-	console.log(tagNames);
 	for (var tag of tagNames)
 	{
 		console.log(tag);
 		const retId = await db_getTag(tag);
 		ret.push(retId);
 	}
-	console.log(ret);
 	return ret;
 }
 
@@ -229,4 +228,12 @@ export function formatDate (date: Date, format: string): string {
     format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
     format = format.replace(/SSS/g, ('00' + date.getMilliseconds()).slice(-3));
     return format;
+};
+
+export const req_kabutan = async(stock: number): Promise<string> =>{
+	const st = stock;
+	const res = await axios.get('https://kabutan.jp/stock/?code=7453');
+	console.log(res);
+	// 
+	return JSON.stringify(res);
 };

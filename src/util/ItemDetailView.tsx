@@ -1,4 +1,4 @@
-import { Box, Chip, Card, Typography, CardContent, CardMedia, Dialog, CardActionArea, CardActions, Button, TextField, CircularProgress, IconButton, Fab, Autocomplete } from '@mui/material';
+import { Box, Chip, Card, Typography, CardContent, CardMedia, Dialog, CardActionArea, CardActions, Button, TextField, CircularProgress, IconButton, Fab, Autocomplete, CardHeader } from '@mui/material';
 import * as React from 'react';
 import { cardInfo, tagInfo } from '../view/ItemCard';
 import DetailEditor from './DetailEditorComponent';
@@ -8,6 +8,8 @@ import AddIcon from '@mui/icons-material/AddCircle';
 import { editButtonBoxStyle } from './DetailEditorComponent';
 import EditIcon from '@mui/icons-material/Edit';
 import Check from '@mui/icons-material/Check';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import { ThumbnailEditorView } from '../view/ThumbnailEditorView';
 
 export interface IItemDetailViewProps {
     card: cardInfo,
@@ -27,6 +29,7 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
     const [saving, setSaving] = useState(false);
     const [tagEditor, setTagEditor] = useState<string[]>([]);
     const [tagEditFlag, setTagEditFlag] = useState(false);
+    const [thumbEditOpen, setThumbEdit] = useState(false);
 
     React.useEffect(() => {
         setCard(props.card);
@@ -44,6 +47,12 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
         setCard(nc);
     }
 
+    const changeThumbnail = (type: string, value: string) => {
+        const nc: cardInfo = tempCard;
+        nc.thumbRef = type;
+        nc.thumb = value;
+    }
+
     const saveCardInformation = async () => {
         if (tagEditFlag) await tagCreate();
         setSaving(true);
@@ -52,6 +61,14 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
             props.onClose();
             setSaving(false);
         })
+    }
+
+    const openThumbEdit = () => {
+        setThumbEdit(true);
+    }
+    
+    const closeThumbEdit = () => {
+        setThumbEdit(false);
     }
 
     const tagCreate = async () => {
@@ -110,15 +127,43 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
         props.onClose();
     }
 
+    const style_cardMedia = {
+    }
+    const style_header = {
+        background: tempCard.thumb,
+        height: '150px',
+    }
+
+    const overlay =  {
+        position: 'absolute' as 'absolute',
+        top: '10px',
+        right: '10px',
+        background: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: '10px',
+        display: 'flex',
+    }
 
     return (
         <Dialog open={props.open} onClose={props.onClose} maxWidth='lg'>
-            <Card>
+            <Card style={{position: 'relative'}}>
+                {tempCard.thumbRef == 'color' ? 
+                <CardHeader style={style_header}/> : 
                 <CardMedia
                     component="img"
                     height={250}
-                    image={props.card.thumb}
+                    image={tempCard.thumb}
+                    style={style_cardMedia}
                 />
+                }
+                
+                <Box style={overlay}>
+                        <IconButton aria-label="edit">
+                            <SaveAltIcon fontSize="inherit" />
+                        </IconButton>
+                        <IconButton onClick={openThumbEdit} aria-label="edit">
+                            <EditIcon fontSize="inherit" />
+                        </IconButton>
+                </Box>
                 <CardContent>
 
                     <DetailEditor
@@ -188,6 +233,7 @@ export default function ItemDetailView(props: IItemDetailViewProps) {
                     </Button>
                 </CardActions>
             </Card>
+            <ThumbnailEditorView onChange={changeThumbnail} open={thumbEditOpen} onClose={closeThumbEdit} card={props.card}/>
         </Dialog>
     );
 };
