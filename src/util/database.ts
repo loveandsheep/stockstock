@@ -75,6 +75,26 @@ export const db_deleteItem = async (id: any) => {
 	await deleteDoc(doc(db, name_collection, id));
 }
 
+export /**
+ * 証券コードを入力して銘柄カードを作成する
+ *
+ * @param {number} stock
+ * @return {*}  {Promise<string>}
+ */
+const db_createNewCardFromStock = async (stock: number): Promise<string> => {
+	const now = Timestamp.fromDate(new Date());
+	let tags:Array<string>;
+	const newTag = await db_getTag('銘柄');
+	tags.push(newTag);
+
+	// TODO: 証券コードから社名など、必要な銘柄情報を引っ張ってくる
+	// TODO: 証券コードの重複が無いかデータベースを洗って確認する
+
+	const docRef = await addDoc(collection(db, name_collection), {
+		// title: 
+	})
+}
+
 /**
  *
  * URLからメタ情報を拾ってきて新規カードを作成する

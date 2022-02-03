@@ -20,14 +20,14 @@ export type tagInfo = {
  *
  */
 export type cardInfo = {
-	itemId: string,
-	title: string,
-	detail: string,
-	tags: Array<string>,
-	tagArr: Array<tagInfo> | undefined,
-	thumb: string,
-	thumbRef: string,
-	date: Timestamp,
+	itemId: string, //ドキュメントIDに一致
+	title: string, //Webタイトル
+	detail: string, //詳細テキスト
+	tags: Array<string>, //タグドキュメントのID
+	tagArr: Array<tagInfo> | undefined, //タグドキュメントIDをパースした情報（ローカルで処理）
+	thumb: string, //サムネイルURL
+	thumbRef: string, //サムネイルの種類
+	date: Timestamp, //作成日
 	dateView: string | undefined,
 	url: string, 
 }
