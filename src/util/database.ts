@@ -7,7 +7,7 @@ import { doc } from 'firebase/firestore';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
 import { cardInfo } from '../view/ItemCard';
-import { createTypePredicateNodeWithModifier } from 'typescript';
+
 
 const name_collection = "items-stock";
 const name_tagCollection = "tags";
@@ -75,25 +75,30 @@ export const db_deleteItem = async (id: any) => {
 	await deleteDoc(doc(db, name_collection, id));
 }
 
-export /**
+// export 
+/**
  * 証券コードを入力して銘柄カードを作成する
  *
  * @param {number} stock
  * @return {*}  {Promise<string>}
  */
-const db_createNewCardFromStock = async (stock: number): Promise<string> => {
-	const now = Timestamp.fromDate(new Date());
-	let tags:Array<string>;
-	const newTag = await db_getTag('銘柄');
-	tags.push(newTag);
+// const db_createNewCardFromStock = async (stock: number): Promise<string> => {
+// 	const now = Timestamp.fromDate(new Date());
+// 	let tags:Array<string>;
+// 	const newTag = await db_getTag('銘柄');
+// 	tags.push(newTag);
+// 	const a = stock;
 
-	// TODO: 証券コードから社名など、必要な銘柄情報を引っ張ってくる
-	// TODO: 証券コードの重複が無いかデータベースを洗って確認する
+// 	// axios.get();
 
-	const docRef = await addDoc(collection(db, name_collection), {
-		// title: 
-	})
-}
+
+// 	// TODO: 証券コードから社名など、必要な銘柄情報を引っ張ってくる
+// 	// TODO: 証券コードの重複が無いかデータベースを洗って確認する
+
+// 	const docRef = await addDoc(collection(db, name_collection), {
+// 		// title: 
+// 	})
+// }
 
 /**
  *
@@ -251,9 +256,17 @@ export function formatDate (date: Date, format: string): string {
 };
 
 export const req_kabutan = async(stock: number): Promise<string> =>{
+
+	// const url = 'https://shikiho.jp/stocks/9101';
+	const url = 'https://twitter.com/sksat_tty/status/1489536157277122564';
 	const st = stock;
-	const res = await axios.get('https://kabutan.jp/stock/?code=7453');
-	console.log(res);
-	// 
-	return JSON.stringify(res);
+	const headers = {};
+
+	axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+
+	console.log('=============axios===============');
+	const resp = await axios.get(url, {headers: headers });
+	console.log("====================response====================");
+	console.log(resp.data);
+	return "hoge";
 };

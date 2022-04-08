@@ -15,6 +15,7 @@ import { myTheme } from '..';
 import { Autocomplete, TextField } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import SearchModalView from '../util/SearchModalView';
+import { test } from '../util/finapi';
 
 export interface ICardViewProps {
 }
@@ -312,7 +313,7 @@ export default class CardView extends React.Component<ICardViewProps, ICardViewS
 	closeDeleteModal = () => {this.setState({deleteModal: false})};
 
 	testMethod = () => {
-		req_kabutan(1010);
+		req_kabutan(9101);
 	}
 
 	public render() {
